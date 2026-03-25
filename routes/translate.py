@@ -4,21 +4,38 @@ import os
 
 router = APIRouter()
 
-# configure Gemini
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel("models/gemini-2.5-flash")
+model = genai.GenerativeModel("gemini-pro")
 
 
 @router.post("/translate")
 def translate_text(data: dict):
-    text = data.get("text")
+    texts = data.get("texts")   # list of texts
     target_lang = data.get("target_lang", "English")
 
-    prompt = f"Translate the following text to {target_lang}: {text}"
+    if not texts:
+        return {"translated": []}
+
+    prompt = f"""
+You are a strict translator.
+
+Translate each sentence into {target_lang}.
+Rules:
+- Return ONLY translated text
+- Do NOT add explanations
+- Keep same order
+- Output as plain list
+
+Texts:
+{texts}
+"""
 
     response = model.generate_content(prompt)
 
-    return {
-        "translated_text": response.text
-    }
+    # Split output into list safely
+    output = response.text.strip().split("\n")
+
+    # Clean numbering if model adds (1., 2., etc.)
+    cleaned = [line.split(".", 1)[-1].strip() for line in output]
+
+    return {"translated": cleaned}
