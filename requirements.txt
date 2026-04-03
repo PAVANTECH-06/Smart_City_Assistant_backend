@@ -11,3 +11,4 @@ python-multipart
 requests
 scikit-learn
 google-generativeai
+deep-translator
