@@ -9,3 +9,4 @@ pandas
 numpy
 python-multipart
 requests
+scikit-learn
