@@ -17,10 +17,13 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
 
+    # 🔥 TEMP ADMIN LOGIC
+    role = "admin" if user.username == "admin" else "user"
+
     new_user = User(
         username=user.username,
         password=hash_password(user.password),
-        role="user"
+        role=role
     )
 
     db.add(new_user)
